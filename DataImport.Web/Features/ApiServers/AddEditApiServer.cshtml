@@ -92,6 +92,7 @@ See the LICENSE and NOTICES files in the project root for more information.
                         }
                     },
                     error: function(data) {
+                        console.log("error");
                         handleAjaxErrors(data);
                         disableTestButton(false);
                     }
