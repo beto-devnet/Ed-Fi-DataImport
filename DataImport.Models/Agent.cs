@@ -31,6 +31,7 @@ namespace DataImport.Models
         [Display(Name = "Agent Action")]
         [MaxLength(50)]
         public string AgentAction { get; set; }
+        public string ActionFile { get; set; }
 
         public string Url { get; set; }
 
