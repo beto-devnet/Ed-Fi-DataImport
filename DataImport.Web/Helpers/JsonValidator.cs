@@ -38,13 +38,9 @@ namespace DataImport.Web.Helpers
                     JToken.Parse(data);
                     return true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-<<<<<<< Updated upstream
                     _logger.LogError(ex, "Cannot parse text as JSON.");
-=======
-                    //_logger.LogError("Cannot parse text as JSON.", ex);
->>>>>>> Stashed changes
                     return false;
                 }
             }
