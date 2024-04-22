@@ -40,7 +40,7 @@ namespace DataImport.Web.Features.ApiServers
 
                 if (apiServer is null)
                 {
-                    throw new System.Exception("Api server not found");
+                    throw new System.ArgumentException("Api server not found");
                 }
 
                 await _configurationService.FillSwaggerMetadata(apiServer);
