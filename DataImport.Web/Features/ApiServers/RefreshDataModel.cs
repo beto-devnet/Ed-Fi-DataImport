@@ -45,9 +45,11 @@ namespace DataImport.Web.Features.ApiServers
 
                 await _configurationService.FillSwaggerMetadata(apiServer);
 
+                await _database.SaveChangesAsync(cancellationToken);
 
                 var dataMaps = await (from dm in _database.DataMaps
                                       join res in _database.Resources on dm.ApiVersionId equals res.ApiVersionId
+                                      where dm.ApiVersion == apiServer.ApiVersion && dm.ResourcePath.Trim() == res.Path.Trim()
                                       select dm
                                      ).ToListAsync(cancellationToken);
 
