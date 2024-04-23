@@ -9,16 +9,19 @@ namespace DataImport.Web.Tests.Features.ApiServers
 {
     public class RefreshDataModelTests
     {
-        [TestCase(1)]
-        public async Task ShouldSuccessfullyRefreshDataModel(int ApiServerId)
+        [Test]
+        public async Task ShouldSuccessfullyRefreshDataModel()
         {
+            var apiServer = GetDefaultApiVersion();
+            var apiServerId = apiServer.Id;
+
             var refreshDataModelResponse = await Send(new RefreshDataModel.Command
             {
-                ApiServerId = ApiServerId
+                ApiServerId = apiServerId
             });
 
             refreshDataModelResponse.Message.ShouldBe("Data model was updated");
-            refreshDataModelResponse.ApiServerId.ShouldBe(ApiServerId);
+            refreshDataModelResponse.ApiServerId.ShouldBe(apiServerId);
         }
 
         [TestCase(0)]
