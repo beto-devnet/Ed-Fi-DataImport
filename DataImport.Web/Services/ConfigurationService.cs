@@ -40,7 +40,7 @@ namespace DataImport.Web.Services
             IEnumerable<SwaggerResource> swaggerResources;
             try
             {
-                swaggerResources = await _swaggerMetadataFetcher.GetMetadata(apiServer.Url, apiServer.ApiVersion.Version);
+                swaggerResources = await _swaggerMetadataFetcher.GetMetadata(apiServer.Url, apiServer.ApiVersion.Version, apiServer.Tenant, apiServer.Context);
             }
             catch (OdsApiServerException e)
             {
@@ -51,27 +51,34 @@ namespace DataImport.Web.Services
             var existingResources = _database.Resources.Where(x => x.ApiVersion.Version == apiServer.ApiVersion.Version).ToList();
             _database.Resources.RemoveRange(existingResources);
 
+            var resources = new List<DataImport.Models.Resource>();
+
             foreach (var swaggerResource in swaggerResources)
             {
                 var metadata = SwaggerMetadataParser.Parse(swaggerResource.Path, swaggerResource.Metadata);
 
-                var resource = new Resource
+                if (resources.Count(x => x.Path == swaggerResource.Path && x.ApiVersion == apiServer.ApiVersion) == 0)
                 {
-                    Metadata = ResourceMetadata.Serialize(metadata),
-                    Path = swaggerResource.Path,
-                    ApiSection = swaggerResource.ApiSection,
-                    ApiVersion = apiServer.ApiVersion
-                };
+                    var resource = new DataImport.Models.Resource
+                    {
+                        Metadata = ResourceMetadata.Serialize(metadata),
+                        Path = swaggerResource.Path,
+                        ApiSection = swaggerResource.ApiSection,
+                        ApiVersion = apiServer.ApiVersion
+                    };
 
-                _database.Resources.Add(resource);
+                    resources.Add(resource);
+                }
             }
+
+            _database.Resources.AddRange(resources);
         }
 
-        public async Task<string> GetTokenUrl(string apiUrl, string apiVersion)
-            => await _swaggerMetadataFetcher.GetTokenUrl(apiUrl, apiVersion);
+        public async Task<string> GetTokenUrl(string apiUrl, string apiVersion, string tenant, string context)
+            => await _swaggerMetadataFetcher.GetTokenUrl(apiUrl, apiVersion, tenant, context);
 
-        public async Task<string> GetAuthUrl(string apiUrl, string apiVersion)
-            => await _swaggerMetadataFetcher.GetAuthUrl(apiUrl, apiVersion);
+        public async Task<string> GetAuthUrl(string apiUrl, string apiVersion, string tenant, string context)
+            => await _swaggerMetadataFetcher.GetAuthUrl(apiUrl, apiVersion, tenant, context);
 
         public async Task<string> InferOdsApiVersion(string apiUrl)
             => await _swaggerMetadataFetcher.InferOdsApiVersion(apiUrl);

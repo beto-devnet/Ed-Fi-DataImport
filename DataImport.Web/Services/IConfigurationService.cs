@@ -12,8 +12,8 @@ namespace DataImport.Web.Services
     {
         Task FillSwaggerMetadata(ApiServer apiServer);
         bool AllowUserRegistrations();
-        Task<string> GetTokenUrl(string apiUrl, string apiVersion);
-        Task<string> GetAuthUrl(string apiUrl, string apiVersion);
+        Task<string> GetTokenUrl(string apiUrl, string apiVersion, string tenant, string context);
+        Task<string> GetAuthUrl(string apiUrl, string apiVersion, string tenant, string context);
         Task<string> InferOdsApiVersion(string apiUrl);
     }
 }

@@ -39,6 +39,12 @@ namespace DataImport.Web.Features.ApiServers
 
             [Display(Name = "API Server Secret")]
             public string Secret { get; set; }
+
+            [Display(Name = "API Server Context")]
+            public string Context { get; set; }
+
+            [Display(Name = "API Server Tenant")]
+            public string Tenant { get; set; }
         }
 
         public class Response
@@ -98,6 +104,8 @@ namespace DataImport.Web.Features.ApiServers
                 var url = request.Url;
                 var key = request.Key;
                 var secret = request.Secret;
+                var context = request.Context;
+                var tenant = request.Tenant;
 
                 var keyIsMasked = SensitiveText.IsMasked(key);
                 var secretIsMasked = SensitiveText.IsMasked(secret);
@@ -129,12 +137,14 @@ namespace DataImport.Web.Features.ApiServers
                     Url = url,
                     Key = key,
                     Secret = secret,
+                    Context = context,
+                    Tenant = tenant,
                 };
 
                 try
                 {
-                    apiServer.TokenUrl = await _configurationService.GetTokenUrl(request.Url, request.ApiVersion);
-                    apiServer.AuthUrl = await _configurationService.GetAuthUrl(request.Url, request.ApiVersion);
+                    apiServer.TokenUrl = await _configurationService.GetTokenUrl(request.Url, request.ApiVersion, tenant, context);
+                    apiServer.AuthUrl = await _configurationService.GetAuthUrl(request.Url, request.ApiVersion, tenant, context);
                 }
                 catch (OdsApiServerException e)
                 {
@@ -145,7 +155,15 @@ namespace DataImport.Web.Features.ApiServers
                 try
                 {
                     var tokenRetriever = new OdsApiTokenRetriever(_oAuthRequestWrapper, apiServer);
+#if DEBUG
+                    var options = new RestClientOptions()
+                    {
+                        RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+                    };
+#else
                     var options = new RestClientOptions();
+#endif
+
                     options.Authenticator = new BearerTokenAuthenticator(tokenRetriever);
                     options.BaseUrl = new Uri(url);
                     var client = new RestClient(options);

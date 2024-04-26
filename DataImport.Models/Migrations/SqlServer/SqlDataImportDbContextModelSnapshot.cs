@@ -17,17 +17,19 @@ namespace DataImport.Models.Migrations.SqlServer
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("DataImport.Models.AdminView", b =>
                 {
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToView("AdminView");
+                    b.ToTable((string)null);
+
+                    b.ToView("AdminView", (string)null);
                 });
 
             modelBuilder.Entity("DataImport.Models.Agent", b =>
@@ -36,7 +38,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AgentAction")
                         .HasMaxLength(50)
@@ -110,7 +112,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AgentId")
                         .HasColumnType("int");
@@ -137,12 +139,16 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ApiVersionId")
                         .HasColumnType("int");
 
                     b.Property<string>("AuthUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Context")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -158,6 +164,10 @@ namespace DataImport.Models.Migrations.SqlServer
                     b.Property<string>("Secret")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tenant")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("TokenUrl")
                         .IsRequired()
@@ -185,7 +195,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Version")
                         .IsRequired()
@@ -207,7 +217,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Exception")
                         .HasColumnType("nvarchar(max)");
@@ -270,7 +280,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ApiVersionId")
                         .HasColumnType("int");
@@ -348,7 +358,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AvailableCmdlets")
                         .HasColumnType("nvarchar(max)");
@@ -361,23 +371,13 @@ namespace DataImport.Models.Migrations.SqlServer
                     b.ToTable("Configurations");
                 });
 
-            modelBuilder.Entity("DataImport.Models.DatabaseVersion", b =>
-                {
-                    b.Property<string>("VersionString")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("DatabaseVersion");
-
-                    b.ToSqlQuery("SELECT @@VERSION as VersionString");
-                });
-
             modelBuilder.Entity("DataImport.Models.DataMap", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ApiVersionId")
                         .HasColumnType("int");
@@ -436,7 +436,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AgentId")
                         .HasColumnType("int");
@@ -456,13 +456,23 @@ namespace DataImport.Models.Migrations.SqlServer
                     b.ToTable("DataMapAgents");
                 });
 
+            modelBuilder.Entity("DataImport.Models.DatabaseVersion", b =>
+                {
+                    b.Property<string>("VersionString")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("DatabaseVersion");
+
+                    b.ToSqlQuery("SELECT @@VERSION as VersionString");
+                });
+
             modelBuilder.Entity("DataImport.Models.File", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AgentId")
                         .HasColumnType("int");
@@ -569,7 +579,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("AgentName")
                         .HasMaxLength(255)
@@ -636,7 +646,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset?>("Completed")
                         .HasColumnType("datetimeoffset");
@@ -655,7 +665,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Key")
                         .IsRequired()
@@ -686,7 +696,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ApiSection")
                         .HasColumnType("int");
@@ -719,7 +729,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ExecutableArguments")
                         .HasColumnType("nvarchar(max)");
@@ -787,7 +797,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -812,7 +822,7 @@ namespace DataImport.Models.Migrations.SqlServer
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");

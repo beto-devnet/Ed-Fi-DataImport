@@ -19,6 +19,8 @@ namespace DataImport.Web.Tests
 
         public const string ApiServerUrlV25 = OdsDomainV25 + "/api/v2.0/2019";
         public const string ApiServerUrlV311 = OdsDomainV311 + "/data/v3";
+        public const string ApiServerUrlV711 = OdsDomainV311 + "/data/v3";
+        public const string ApiServerUrlV711WithOdsContext = OdsDomainV311 + "/2022/data/v3";
 
         public async Task<string> DownloadString(string url)
         {

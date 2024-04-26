@@ -16,7 +16,7 @@ function Invoke-RegenerateFile {
 
     if ($new_content -ne $oldContent) {
         $relative_path = Resolve-Path -Relative $Path
-        Write-Host "Generating $relative_path"
+        Write-Information "Generating $relative_path"
         [System.IO.File]::WriteAllText($Path, $NewContent, [System.Text.Encoding]::UTF8)
     }
 }
@@ -43,8 +43,7 @@ function Invoke-Step {
 
     $command = $block.ToString().Trim()
 
-    Write-Host
-    Write-Host $command -fore CYAN
+    Write-Information $command
 
     &$block
 }
@@ -57,13 +56,10 @@ function Invoke-Main {
 
     try {
         &$MainBlock
-        Write-Host
-        Write-Host "Build Succeeded" -fore GREEN
+        Write-Information "Build Succeeded"
         exit 0
     } catch [Exception] {
-        Write-Host
         Write-Error $_.Exception.Message
-        Write-Host
         Write-Error "Build Failed"
         exit 1
     }

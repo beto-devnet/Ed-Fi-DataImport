@@ -33,6 +33,10 @@ using DataImport.Web.Infrastructure.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using DataImport.Web.Middleware;
+using Microsoft.AspNetCore.Http.Features;
+#if DEBUG
+using System.Net.Http;
+#endif
 
 namespace DataImport.Web
 {
@@ -46,6 +50,9 @@ namespace DataImport.Web
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+#if DEBUG
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+#endif
         }
 
         public IConfiguration Configuration
@@ -71,17 +78,24 @@ namespace DataImport.Web
             services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));
             services.Configure<ExternalPreprocessorOptions>(_configuration.GetSection("ExternalPreprocessors"));
             services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
-            services.AddSingleton<Microsoft.Extensions.Logging.ILogger>(sp => sp.GetService<ILogger<NoLoggingCategoryPlaceHolder>>());
+            services.Configure<FormOptions>(Configuration.GetSection("FormOptions")); services.AddSingleton<Microsoft.Extensions.Logging.ILogger>(sp => sp.GetService<ILogger<NoLoggingCategoryPlaceHolder>>());
             services.AddTransient<IFileSettings>(sp => sp.GetService<IOptions<AppSettings>>().Value);
             services.AddTransient<IPowerShellPreprocessSettings>(sp => sp.GetService<IOptions<AppSettings>>().Value);
             services.AddTransient<IEncryptionKeySettings>(sp => sp.GetService<IOptions<AppSettings>>().Value);
             services.AddTransient<IEncryptionKeyResolver, OptionsEncryptionKeyResolver>();
 
             services.AddAutoMapper(typeof(Startup));
-            services.AddMediatR(typeof(Startup));
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             services.AddHttpContextAccessor();
 
+#if DEBUG
+            services.AddHttpClient(Helpers.Constants.LocalHttpClientName).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+            });
+#else
             services.AddHttpClient();
+#endif
 
             var databaseEngine = Configuration["AppSettings:DatabaseEngine"];
 
@@ -128,6 +142,7 @@ namespace DataImport.Web
             services.AddScoped<Services.Swagger.ISwaggerMetadataFetcher, Services.Swagger.SwaggerMetadataFetcher>();
             services.AddScoped<Services.Swagger.ISwaggerMetadataProcessor, Services.Swagger.SwaggerMetadataProcessorV1>();
             services.AddScoped<Services.Swagger.ISwaggerMetadataProcessor, Services.Swagger.SwaggerMetadataProcessorV2>();
+            services.AddScoped<Services.Swagger.ISwaggerMetadataProcessor, Services.Swagger.SwaggerMetadataProcessorV3>();
             services.AddTransient<Features.Agent.AgentSelectListProvider>();
             services.AddScoped<IEncryptionService, EncryptionService>();
             services.AddSingleton<IClock, Clock>();
