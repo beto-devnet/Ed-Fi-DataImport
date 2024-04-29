@@ -25,9 +25,9 @@ namespace DataImport.Web.Tests.Features.ApiServers
         }
 
         [TestCase(0)]
-        public void ShouldThrowAnExceptionWhenApiServerNotExist(int ApiServerId)
+        public void ShouldThrowAnExceptionWhenApiServerNotExist(int apiServerId)
         {
-            var command = new RefreshDataModel.Command { ApiServerId = ApiServerId };
+            var command = new RefreshDataModel.Command { ApiServerId = apiServerId };
             var exception = Assert.ThrowsAsync<ArgumentException>(async () => await Send(command));
 
             exception.Message.ShouldBe("Api server not found");
