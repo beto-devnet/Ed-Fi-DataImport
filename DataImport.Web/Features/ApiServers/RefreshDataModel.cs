@@ -55,7 +55,7 @@ namespace DataImport.Web.Features.ApiServers
 
                 var resourcesPath = dataMaps.Select(map => map.ResourcePath).Distinct().ToList();
 
-                var metadataFromRresources = await _database
+                var metadataFromResources = await _database
                     .Resources
                     .Where(resource => resource.ApiVersionId == apiServer.ApiVersionId && resourcesPath.Contains(resource.Path))
                     .Select(resource => new { resource.Path, resource.Metadata })
@@ -63,7 +63,7 @@ namespace DataImport.Web.Features.ApiServers
 
                 dataMaps.ForEach(map =>
                 {
-                    map.Metadata = metadataFromRresources.Where(x => x.Path == map.ResourcePath).Select(x => x.Metadata).First();
+                    map.Metadata = metadataFromResources.Where(x => x.Path == map.ResourcePath).Select(x => x.Metadata).First();
                 });
 
                 _database.DataMaps.UpdateRange(dataMaps);
@@ -74,7 +74,6 @@ namespace DataImport.Web.Features.ApiServers
                     ApiServerId = apiServer.Id,
                     Message = "Data model was updated"
                 };
-
             }
         }
     }
