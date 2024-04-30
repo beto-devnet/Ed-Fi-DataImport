@@ -3,6 +3,8 @@ using DataImport.Web.Helpers;
 using DataImport.Web.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NUglify;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,11 +49,21 @@ namespace DataImport.Web.Features.ApiServers
 
                 await _database.SaveChangesAsync(cancellationToken);
 
-                var dataMaps = await (from dm in _database.DataMaps
-                                      join res in _database.Resources on dm.ApiVersionId equals res.ApiVersionId
-                                      where dm.ApiVersion == apiServer.ApiVersion && dm.ResourcePath.Trim() == res.Path.Trim()
-                                      select dm
-                                     ).ToListAsync(cancellationToken);
+                //var dataMaps = await (from dm in _database.DataMaps
+                //                      join res in _database.Resources on dm.ApiVersionId equals res.ApiVersionId
+                //                      where dm.ApiVersion == apiServer.ApiVersion && dm.ResourcePath.Trim() == res.Path.Trim()
+                //                      select dm
+                //                     ).ToListAsync(cancellationToken);
+
+                var dataMaps = await _database.DataMaps
+                    .Join(_database.Resources,
+                        dataMap => dataMap.ApiVersionId,
+                        resource => resource.ApiVersionId,
+                        (dataMap, resource) => new { dataMap = dataMap, resource = resource }
+                    )
+                    .Where(res => res.dataMap.ApiVersionId == apiServer.ApiVersionId && res.dataMap.ResourcePath.Trim() == res.resource.Path.Trim())
+                    .Select(x => x.dataMap)
+                    .ToListAsync(cancellationToken);
 
                 var resourcesPath = dataMaps.Select(map => map.ResourcePath).Distinct().ToList();
 
@@ -63,7 +75,11 @@ namespace DataImport.Web.Features.ApiServers
 
                 dataMaps.ForEach(map =>
                 {
-                    map.Metadata = metadataFromResources.Where(x => x.Path == map.ResourcePath).Select(x => x.Metadata).First();
+                    var newMetadata = metadataFromResources.Where(x => x.Path == map.ResourcePath).Select(x => x.Metadata).FirstOrDefault();
+                    if (newMetadata is not null)
+                    {
+                        map.Metadata = newMetadata;
+                    }
                 });
 
                 _database.DataMaps.UpdateRange(dataMaps);
